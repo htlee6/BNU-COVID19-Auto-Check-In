@@ -107,14 +107,28 @@ def main(username, password):
 def run():
     if not os.path.exists('./config.json'):
         msg = '''{
-        "username": "你的北邮统一认证平台用户名",
-        "password": "你的北邮统一认证平台密码",
-        "schedule": {
-            "on": false,
-            "hour": "0",
-            "minute": "1"
+    "info": [
+        {
+            "username": "你的北邮统一认证平台用户名",
+            "password": "你的北邮统一认证平台密码",
+            "schedule": {
+                "on": false,
+                "hour": "0",
+                "minute": "1"
+            }
+        },
+        {
+            "username": "你的北邮统一认证平台用户名",
+            "password": "你的北邮统一认证平台密码",
+            "schedule": {
+                "on": false,
+                "hour": "0",
+                "minute": "2"
+            }
         }
-    }'''
+    ]
+}
+'''
         print("请创建config.json文件到项目路径({})下，内容如下：".format(os.getcwd(), msg))
         return
 
