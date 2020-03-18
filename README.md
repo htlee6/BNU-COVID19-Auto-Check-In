@@ -1,6 +1,6 @@
 # BUPT-nCov-Hitcarder
 
-北航nCov肺炎健康打卡脚本
+北邮nCov肺炎健康打卡脚本
 
  - python模块
  - 提供托管服务
@@ -50,7 +50,7 @@
 
 感谢浙大原始代码 [ZJU-nCov-Hitcarder](https://github.com/Tishacy/ZJU-nCov-Hitcarder)
 
-感谢浙大原始代码 [BUAA-nCov-Hitcarder](https://github.com/timfaner/BUAA-nCov-Hitcarder)
+感谢北航原始代码 [BUAA-nCov-Hitcarder](https://github.com/timfaner/BUAA-nCov-Hitcarder)
 
 
 
