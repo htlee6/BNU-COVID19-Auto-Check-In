@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 # /usr/bin/python
+import os
+import getpass
 import requests, json, re
 import time, datetime, sys
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 login_url = "https://app.bupt.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.bupt.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
@@ -103,8 +106,40 @@ def main(username, password):
         return 0
 
 
+def run():
+    if not os.path.exists('./config.json'):
+        msg = '''{
+        "username": "你的北邮统一认证平台用户名",
+        "password": "你的北邮统一认证平台密码",
+        "schedule": {
+            "on": false,
+            "hour": "0",
+            "minute": "1"
+        }
+    }'''
+        print("请创建config.json文件到项目路径({})下，内容如下：".format(os.getcwd(), msg))
+        return
+
+    configs = json.loads(open('./config.json', 'r').read())
+    username = configs["username"]
+    password = configs["password"]
+    scheduler_flag = configs["schedule"]["on"]
+    hour = configs["schedule"]["hour"]
+    minute = configs["schedule"]["minute"]
+
+    if scheduler_flag:
+        # Schedule task
+        scheduler = BlockingScheduler()
+        scheduler.add_job(main, 'cron', args=[username, password], hour=hour, minute=minute)
+        print('⏰ 已启动定时程序，每天 %02d:%02d 为您打卡' % (int(hour), int(minute)))
+        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+
+        try:
+            scheduler.start()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+    else:
+        main(username, password)
 
 if __name__=="__main__":
-    #username = sys.argv[1]
-    #password = sys.argv[2]
-    main("2019110680","2019110680tch...")
+    run()
