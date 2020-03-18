@@ -7,9 +7,11 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 class DaKa(object):
-    def __init__(self, username, password):
+    def __init__(self, username, password, sms_number="", sms_api_key=""):
         self.username = username
         self.password = password
+        self.sms_number = sms_number
+        self.sms_api_key = sms_api_key
         self.info = None
 
         self.login_url = "https://app.bupt.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.bupt.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
@@ -17,6 +19,8 @@ class DaKa(object):
         self.save_url = "https://app.bupt.edu.cn/ncov/wap/default/save"
         self.login_check_url = "https://app.bupt.edu.cn/uc/wap/login/check"
         self.sess = requests.Session()
+
+        self.sms_url_api = "https://api.binstd.com/sms/send?mobile={}&content={}&appkey={}"
 
     def login(self):
         """Login to BUPT platform"""
@@ -67,6 +71,8 @@ class DaKa(object):
 
         self.info = new_info
 
+        self.save_info()
+
         return new_info
 
     @ staticmethod
@@ -78,26 +84,47 @@ class DaKa(object):
         result_int = pow(password_int, e_int, m_int)
         return hex(result_int)[2:].rjust(128, '0')
 
-    def daka(self):
-        res = self.login()
-        print("--------login res-------\n", res)
-        res = self.get_info()
-        print("--------get_info res-------\n", res)
-        res = self.post()
-        print("--------post res-------\n", res)
+    def save_info(self):
+        with open("cache_info_bk.json", "w", encoding="utf-8") as file:
+            json.dump(self.info, file)
+
+    def send_sms(self, res):
+        print("-----------sms----------")
+        if len(self.sms_api_key) <= 0 or len(self.sms_number) <= 0:
+            return "没有配置短信接收手机号码或者短信api_key"
+        if res['e'] == 0:
+            msg = "打卡成功！\n{}".format(res["m"])
+        else:
+            msg = "打卡失败！\n{}".format(res["m"])
+        print(msg)
+        url = self.sms_url_api.format(self.sms_number, msg, self.sms_api_key)
+        print(url)
+        res = json.loads(requests.post(url).content)
+        print(res)
         return res
 
+    def daka(self):
+        ret = []
+        res = self.login()
+        ret.append(res)
+        print("--------login res-------\n----", res)
+        res = self.get_info()
+        ret.append(res)
+        print("--------get_info res-------\n----", res)
+        res = self.post()
+        ret.append(res)
+        print("--------post res-------\n----", res)
+        res = self.send_sms(res)
+        ret.append(res)
+        print("--------send_sms res-------\n----", res)
+        return ret
 
-def main(username, password):
 
-    dk = DaKa(username, password)
+def main(username, password, sms_number="", sms_api_key=""):
+
+    dk = DaKa(username, password, sms_number, sms_api_key)
     try:
-        res = dk.daka()
-
-        if res['e'] == 0:
-            print("打卡成功")
-        else:
-            print("打卡失败，原因：{}".format(res["m"]))
+        dk.daka()
     except Exception as e:
         print(e)
     finally:
@@ -133,9 +160,11 @@ def run():
         return
 
     configs = json.loads(open('./config.json', 'r').read())
+    sms_api_key = configs.get("sms_api_key", "")
     for config in configs["info"]:
         username = config["username"]
         password = config["password"]
+        sms_number = config["sms_number"]
         scheduler_flag = config["schedule"]["on"]
         hour = config["schedule"]["hour"]
         minute = config["schedule"]["minute"]
@@ -152,7 +181,7 @@ def run():
             except (KeyboardInterrupt, SystemExit):
                 pass
         else:
-            main(username, password)
+            main(username, password, sms_number, sms_api_key)
 
 
 if __name__ == "__main__":
