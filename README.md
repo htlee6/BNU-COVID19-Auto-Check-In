@@ -45,7 +45,7 @@
 
 ## LICENSE
 
-Copyright (c) 2020 chaunhewie && 7O11.
+Copyright (c) 2020 chaunhewie.
 
 Licensed under the [MIT License](https://github.com/chaunhewie/BUPT-nCov-Hitcarder/blob/master/LICENSE)
 
