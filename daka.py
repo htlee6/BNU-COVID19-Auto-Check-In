@@ -1,39 +1,35 @@
 # -*- coding: utf-8 -*-
 # /usr/bin/python
 import os
-import getpass
 import requests, json, re
-import time, datetime, sys
+import time, datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-
-login_url = "https://app.bupt.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.bupt.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
-base_url = "https://app.bupt.edu.cn/ncov/wap/default/index"
-save_url = "https://app.bupt.edu.cn/ncov/wap/default/save"
-login_check_url = "https://app.bupt.edu.cn/uc/wap/login/check"
 
 class DaKa(object):
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.name = ""
-        self.number = ""
+        self.info = None
+
+        self.login_url = "https://app.bupt.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.bupt.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
+        self.base_url = "https://app.bupt.edu.cn/ncov/wap/default/index"
+        self.save_url = "https://app.bupt.edu.cn/ncov/wap/default/save"
+        self.login_check_url = "https://app.bupt.edu.cn/uc/wap/login/check"
         self.sess = requests.Session()
 
     def login(self):
         """Login to BUPT platform"""
-        res = self.sess.get(login_url)
+        res = self.sess.get(self.login_url)
         
         if res.status_code != 200:
             raise Exception("{} 登陆平台失败，失败代码{}".format(self.username,res.status_code))
-        #n, e = res['modulus'], res['exponent']
-        #encrypt_password = self._rsa_encrypt(self.password, e, n)
 
         data = {
             'username': self.username,
             'password': self.password,
         }
-        res = self.sess.post(url=login_check_url, data=data)
+        res = self.sess.post(url=self.login_check_url, data=data)
         ret = json.loads(res.content.decode())
 
         if ret['e'] != 0:
@@ -42,21 +38,22 @@ class DaKa(object):
     
     def post(self):
         """Post the hitcard info"""
-        res = self.sess.post(save_url, data=self.info)
+        res = self.sess.post(self.save_url, data=self.info)
         if res.status_code != 200:
-            raise Exception("{} post info faild, statu code = {}".format(self.username,res.status_code))
+            raise Exception("{} post info faild, statu code = {}".format(self.username, res.status_code))
         return json.loads(res.text)
-    
-    def get_date(self):
+
+    @ staticmethod
+    def get_date():
         today = datetime.date.today()
-        return "%4d%02d%02d" %(today.year, today.month, today.day)
+        return "%4d%02d%02d" % (today.year, today.month, today.day)
         
     def get_info(self, html=None):
         """Get hitcard info, which is the old info with updated new time."""
         if not html:
-            res = self.sess.get(base_url)
+            res = self.sess.get(self.base_url)
             if res.status_code != 200:
-                raise Exception("{} get info faild, statu code = {}".format(self.username,res.status_code))
+                raise Exception("{} get info faild, statu code = {}".format(self.username, res.status_code))
             html = res.content.decode()
         old_info = json.loads(re.findall(r'oldInfo: (.*)', html)[0][:-1])
         name = re.findall(r'realname: "([^\"]+)",', html)[0]
@@ -69,14 +66,16 @@ class DaKa(object):
         new_info["created"] = round(time.time())
 
         self.info = new_info
+
         return new_info
 
-    def _rsa_encrypt(self, password_str, e_str, M_str):
+    @ staticmethod
+    def _rsa_encrypt(self, password_str, e_str, m_str):
         password_bytes = bytes(password_str, 'ascii') 
         password_int = int.from_bytes(password_bytes, 'big')
         e_int = int(e_str, 16) 
-        M_int = int(M_str, 16) 
-        result_int = pow(password_int, e_int, M_int) 
+        m_int = int(m_str, 16)
+        result_int = pow(password_int, e_int, m_int)
         return hex(result_int)[2:].rjust(128, '0')
 
     def daka(self):
@@ -87,7 +86,6 @@ class DaKa(object):
         res = self.post()
         print("--------post res-------\n", res)
         return res
-
 
 
 def main(username, password):
@@ -121,25 +119,27 @@ def run():
         return
 
     configs = json.loads(open('./config.json', 'r').read())
-    username = configs["username"]
-    password = configs["password"]
-    scheduler_flag = configs["schedule"]["on"]
-    hour = configs["schedule"]["hour"]
-    minute = configs["schedule"]["minute"]
+    for config in configs:
+        username = config["username"]
+        password = config["password"]
+        scheduler_flag = config["schedule"]["on"]
+        hour = config["schedule"]["hour"]
+        minute = config["schedule"]["minute"]
 
-    if scheduler_flag:
-        # Schedule task
-        scheduler = BlockingScheduler()
-        scheduler.add_job(main, 'cron', args=[username, password], hour=hour, minute=minute)
-        print('⏰ 已启动定时程序，每天 %02d:%02d 为您打卡' % (int(hour), int(minute)))
-        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+        if scheduler_flag:
+            # Schedule task
+            scheduler = BlockingScheduler()
+            scheduler.add_job(main, 'cron', args=[username, password], hour=hour, minute=minute)
+            print('⏰ 已启动定时程序，每天 %02d:%02d 为您打卡' % (int(hour), int(minute)))
+            print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
-        try:
-            scheduler.start()
-        except (KeyboardInterrupt, SystemExit):
-            pass
-    else:
-        main(username, password)
+            try:
+                scheduler.start()
+            except (KeyboardInterrupt, SystemExit):
+                pass
+        else:
+            main(username, password)
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     run()
