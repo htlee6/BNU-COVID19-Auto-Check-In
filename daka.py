@@ -133,7 +133,7 @@ def run():
         return
 
     configs = json.loads(open('./config.json', 'r').read())
-    for config in configs:
+    for config in configs["info"]:
         username = config["username"]
         password = config["password"]
         scheduler_flag = config["schedule"]["on"]
