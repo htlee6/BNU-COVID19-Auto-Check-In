@@ -4,10 +4,10 @@ import requests, json, re
 import time, datetime, sys
 
 
-login_url = "https://app.buaa.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.buaa.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex%3Ffrom%3Dhistory"
-base_url = "https://app.buaa.edu.cn/ncov/wap/default/index"
-save_url = "https://app.buaa.edu.cn/ncov/wap/default/save"
-login_check_url = "https://app.buaa.edu.cn/uc/wap/login/check"
+login_url = "https://app.bupt.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.bupt.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
+base_url = "https://app.bupt.edu.cn/ncov/wap/default/index"
+save_url = "https://app.bupt.edu.cn/ncov/wap/default/save"
+login_check_url = "https://app.bupt.edu.cn/uc/wap/login/check"
 
 class DaKa(object):
     def __init__(self, username, password):
@@ -18,7 +18,7 @@ class DaKa(object):
         self.sess = requests.Session()
 
     def login(self):
-        """Login to BUAA platform"""
+        """Login to BUPT platform"""
         res = self.sess.get(login_url)
         
         if res.status_code != 200:
@@ -55,39 +55,17 @@ class DaKa(object):
             if res.status_code != 200:
                 raise Exception("{} get info faild, statu code = {}".format(self.username,res.status_code))
             html = res.content.decode()
-        
-        old_info_raw = re.findall(r'oldInfo: (.*)', html)[0][:-1]
-
-        # 解决 geo_api_info 字段奇怪的转义问题
-        geo_info_raw = re.findall(r'"geo_api_info":"(.*)","area"', old_info_raw)[0]
-        geo_info = json.loads(geo_info_raw.replace('\\"','"'))
-        geo_info_match = re.search(r'("geo_api_info":.*",)"area"', old_info_raw)
-        geo_regs = geo_info_match.regs[1]
-
-        old_info_raw = old_info_raw[0:geo_regs[0]]  + old_info_raw[geo_regs[1]:]
-        old_info = json.loads(old_info_raw)
-
+        old_info = json.loads(re.findall(r'oldInfo: (.*)', html)[0][:-1])
         name = re.findall(r'realname: "([^\"]+)",', html)[0]
         number = re.findall(r"number: '([^\']+)',", html)[0]
 
-        self.name = name
-        self.number = number
-
         new_info = old_info.copy()
-        new_info.update({"geo_api_info":geo_info})
+        new_info['name'] = name
+        new_info['number'] = number
         new_info["date"] = self.get_date()
         new_info["created"] = round(time.time())
-        
-        # 未知的奇怪参数
-        new_info.update({"gwszdd":""})
-        new_info.update({"sfyqjzgc":""})
-        new_info.update({"jrsfqzys":""})
-        new_info.update({"jrsfqzfy":""})
-        self.info = new_info
 
-        self.realname = name
-        self.school_id = number
-        self.position = geo_info['formattedAddress']
+        self.info = new_info
         return new_info
 
     def _rsa_encrypt(self, password_str, e_str, M_str):
@@ -99,10 +77,13 @@ class DaKa(object):
         return hex(result_int)[2:].rjust(128, '0')
 
     def daka(self):
-        self.login()
-        self.get_info()
-        ret =  self.post()
-        return ret
+        res = self.login()
+        print("--------login res-------\n", res)
+        res = self.get_info()
+        print("--------get_info res-------\n", res)
+        res = self.post()
+        print("--------post res-------\n", res)
+        return res
 
 
 
@@ -111,11 +92,11 @@ def main(username, password):
     dk = DaKa(username, password)
     try:
         res = dk.daka()
-        
-        if ret['e'] == 0:
+
+        if res['e'] == 0:
             print("打卡成功")
         else:
-            print("打卡失败，原因：{}".format(ret["m"]))
+            print("打卡失败，原因：{}".format(res["m"]))
     except Exception as e:
         print(e)
     finally:
@@ -126,4 +107,4 @@ def main(username, password):
 if __name__=="__main__":
     #username = sys.argv[1]
     #password = sys.argv[2]
-    main("fjlsso","Fzw20859")
+    main("2019110680","2019110680tch...")
