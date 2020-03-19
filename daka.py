@@ -60,6 +60,7 @@ class DaKa(object):
                 raise Exception("{} get info faild, statu code = {}".format(self.username, res.status_code))
             html = res.content.decode()
         old_info = json.loads(re.findall(r'oldInfo: (.*)', html)[0][:-1])
+        print("old_info:", old_info)
         name = re.findall(r'realname: "([^\"]+)",', html)[0]
         number = re.findall(r"number: '([^\']+)',", html)[0]
 
