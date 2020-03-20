@@ -2,7 +2,7 @@
 
 北邮nCov肺炎健康打卡脚本
 
- - 可定时，默认不定时，定时为每天0点1分（在config.json中修正）
+ - 可定时，默认不定时，定时为每天0点1分（在config.json中配置）
  - 默认每次提交上次所提交的内容（只有时间部分更新）
 
  项目用于学习交流，仅用于各项无异常时打卡，如有身体不适等情况还请自行如实打卡~
@@ -13,7 +13,7 @@
 
 1. clone本项目并cd到本目录
     ```bash
-    $ git clone https://github.com/timfaner/BUPT-nCov-Hitcarder.git --depth 1
+    $ git clone git@github.com:Chaunhewie/BUPT-nCov-Hitcarder.git --depth 1
     $ cd BUPT-nCov-Hitcarder
     ```
     
@@ -25,7 +25,9 @@
 
 3. 运行一次打卡
     ```bash
-    python3 daka.py username password
+    vim config.json
+    填写 username password
+    python3 daka.py
     ```
 
 4. 定时自动打卡脚本
