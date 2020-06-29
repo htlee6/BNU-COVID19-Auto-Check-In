@@ -20,7 +20,8 @@ class DaKa(object):
         self.login_check_url = "https://app.bupt.edu.cn/uc/wap/login/check"
         self.sess = requests.Session()
 
-        self.sms_url_api = "https://api.binstd.com/sms/send?mobile={}&content={}&appkey={}"
+        # self.sms_url_api = "https://api.binstd.com/sms/send?mobile={}&content={}&appkey={}"
+        self.sms_url_api = 'https://sc.ftqq.com/{}.send?text={}&desp={}'
 
     def login(self):
         """Login to BUPT platform"""
@@ -98,9 +99,9 @@ class DaKa(object):
         else:
             msg = "打卡失败！\n{}".format(res["m"])
         print(msg)
-        url = self.sms_url_api.format(self.sms_number, msg, self.sms_api_key)
+        url = self.sms_url_api.format(self.sms_api_key, "BUPT-nCov-Hitcarder Check in", msg)
         print(url)
-        res = json.loads(requests.post(url).content)
+        res = json.loads(requests.get(url).content)
         print(res)
         return res
 
@@ -135,6 +136,7 @@ def main(username, password, sms_number="", sms_api_key=""):
 def run():
     if not os.path.exists('./config.json'):
         msg = '''{
+    "sms_api_key": "Server酱的SCKEY",
     "info": [
         {
             "username": "你的北邮统一认证平台用户名",
