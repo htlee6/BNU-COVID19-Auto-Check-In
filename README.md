@@ -1,8 +1,8 @@
-# BUPT-nCov-Hitcarder
+# BNU COVID19 Auto Check In
+ 
+BNU COVID19 健康打卡脚本
 
-北邮nCov肺炎健康打卡脚本
-
- - 可定时，默认不定时，定时为每天0点1分（在config.json中配置）
+ - 可定时，默认不定时，定时时间请在config.json中配置
  - 默认每次提交上次所提交的内容（只有时间部分更新）
 
  项目用于学习交流，仅用于各项无异常时打卡，如有身体不适等情况还请自行如实打卡~
@@ -13,8 +13,8 @@
 
 1. clone本项目并cd到本目录
     ```bash
-    $ git clone git@github.com:Chaunhewie/BUPT-nCov-Hitcarder.git --depth 1
-    $ cd BUPT-nCov-Hitcarder
+    $ git clone https://github.com/w29593617/BNU-COVID19-Auto-Check-In.git --depth 1
+    $ cd BNU-COVID19-Auto-Check-In
     ```
     
 2. 安装依赖
@@ -25,8 +25,7 @@
 
 3. 运行一次打卡
     ```bash
-    vim config.json
-    填写 username password
+    编辑config.json文件中相关信息并保存
     python3 daka.py
     ```
 
@@ -41,12 +40,14 @@
 
 ## Thanks
 
+此Repo中的内容使用了@Chaunhewie的[BUPT-nCov-Hitcarder](https://github.com/chaunhewie/BUPT-nCov-Hitcarder)，并进行了一些修改
+
 感谢浙大原始代码 [ZJU-nCov-Hitcarder](https://github.com/Tishacy/ZJU-nCov-Hitcarder)
 
 
 ## LICENSE
 
-Copyright (c) 2020 chaunhewie.
+Copyright (c) 2020 htlee.
 
-Licensed under the [MIT License](https://github.com/chaunhewie/BUPT-nCov-Hitcarder/blob/master/LICENSE)
+Licensed under the ***MIT License***
 
