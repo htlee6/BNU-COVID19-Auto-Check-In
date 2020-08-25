@@ -1,22 +1,14 @@
 {
     "info": [
         {
-            "username": "你的北邮统一认证平台用户名",
-            "password": "你的北邮统一认证平台密码",
+            "username": "北师大学号",
+            "password": "北师大信息门户密码",
             "schedule": {
                 "on": false,
-                "hour": "0",
-                "minute": "1"
-            }
-        },
-        {
-            "username": "你的北邮统一认证平台用户名",
-            "password": "你的北邮统一认证平台密码",
-            "schedule": {
-                "on": false,
-                "hour": "0",
-                "minute": "2"
-            }
+                "hour": "自动打卡的小时，如9",
+                "minute": "自动打卡的分钟，如0"
+            },
+            "sms_number": "你的手机号码，不必填写真实的"
         }
-    ]
+        ]
 }
