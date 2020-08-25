@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-# /usr/bin/python
+#! /usr/bin/python3
+
 import os
 import requests, json, re
 import time, datetime
@@ -14,10 +14,10 @@ class DaKa(object):
         self.sms_api_key = sms_api_key
         self.info = None
 
-        self.login_url = "https://app.bupt.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fapp.bupt.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
-        self.base_url = "https://app.bupt.edu.cn/ncov/wap/default/index"
-        self.save_url = "https://app.bupt.edu.cn/ncov/wap/default/save"
-        self.login_check_url = "https://app.bupt.edu.cn/uc/wap/login/check"
+        self.login_url = "https://onewechat.bnu.edu.cn/uc/wap/login?redirect=https%3A%2F%2Fonewechat.bnu.edu.cn%2Fncov%2Fwap%2Fdefault%2Findex"
+        self.base_url = "https://onewechat.bnu.edu.cn/ncov/wap/default/index"
+        self.save_url = "https://onewechat.bnu.edu.cn/ncov/wap/default/save"
+        self.login_check_url = "https://onewechat.bnu.edu.cn/uc/wap/login/check"
         self.sess = requests.Session()
 
         # self.sms_url_api = "https://api.binstd.com/sms/send?mobile={}&content={}&appkey={}"
